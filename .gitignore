@@ -1,3 +1,8 @@
+# Project Related Directories
+data/
+proc/
+conda_environment/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
