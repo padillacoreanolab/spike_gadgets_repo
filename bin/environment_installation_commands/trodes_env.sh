@@ -6,3 +6,5 @@ conda install -c conda-forge notebook -y
 # Data Processing Libraries
 conda install -c conda-forge numpy -y
 conda install -c conda-forge matplotlib -y
+# Video Processing Libraries
+conda install -c conda-forge opencv -y
