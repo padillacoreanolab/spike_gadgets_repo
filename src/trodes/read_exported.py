@@ -111,14 +111,14 @@ def update_trodes_file_to_data(file_path, file_to_data=None):
         warnings.warn("Can not process {}".format(absolute_file_path))
         return None
 
-def get_all_trodes_data_from_directory(directory_path):
+def get_all_trodes_data_from_directory(parent_directory_path="."):
     """
     Goes through all the files in a directory created by Trodes. 
     Each file is organized into a dictionary that is directory name to the file name to associated data/metadata of the file.
-    The structure would look something like: result[directory_name][file_name][data_type]
+    The structure would look something like: result[current_directory_name][file_name][data_type]
 
     Args:
-        directory_path(str): Path of the directory that contains the Trodes recording files. Can be relative or absolute path.
+        parent_directory_path(str): Path of the directory that contains the Trodes recording files. Can be relative or absolute path.
 
     Returns:
         Dictionary that has the Trodes directory name as the key and a subdictionary as the values. 
@@ -126,22 +126,22 @@ def get_all_trodes_data_from_directory(directory_path):
     """
     directory_to_file_to_data = defaultdict(dict)
     # Going through each directory
-    for item in os.listdir(directory_path):
-        item_path = os.path.join(directory_path, item)
+    for item in os.listdir(parent_directory_path):
+        item_path = os.path.join(parent_directory_path, item)
         # Getting the directory name to save as the key
         if os.path.isdir(item_path):
-            directory_name = os.path.basename(item_path)
+            current_directory_name = os.path.basename(item_path)
         # If the item is a file instead of a directory
         else:
-            directory_name = "."
-        directory_path = os.path.join(directory_path, directory_name)
+            current_directory_name = "."
+        current_directory_path = os.path.join(parent_directory_path, current_directory_name)
         # Going through each file in the directory
-        for file_name in os.listdir(directory_path):
-            file_path = os.path.join(directory_path, file_name)
+        for file_name in os.listdir(current_directory_path):
+            file_path = os.path.join(current_directory_path, file_name)
             if os.path.isfile(file_path):
                 # Creating a sub dictionary that has file keys and a sub-sub dictionary of data type to data value 
-                current_directory_to_file_to_data = update_trodes_file_to_data(file_path=file_path, directory_to_file_to_data=directory_to_file_to_data[directory_name])
+                current_directory_to_file_to_data = update_trodes_file_to_data(file_path=file_path, file_to_data=directory_to_file_to_data[current_directory_name])
                 # None will be returned if the file can not be processed
                 if current_directory_to_file_to_data is not None:
-                    directory_to_file_to_data[directory_name] = current_directory_to_file_to_data
+                    directory_to_file_to_data[current_directory_name] = current_directory_to_file_to_data
     return directory_to_file_to_data
