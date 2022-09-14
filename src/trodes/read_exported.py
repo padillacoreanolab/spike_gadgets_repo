@@ -5,6 +5,7 @@ import os
 import warnings
 import re
 from collections import defaultdict
+import pathlib
 import numpy as np
 
 def parse_exported_file(file_path):
@@ -71,12 +72,13 @@ def parse_fields(field_str):
 def get_key_with_substring(input_dict, substring="", return_first=True):
     """
     """
-    input_dict.keys()
     keys_with_substring = []
     for key in input_dict.keys():
         if substring in key:
             keys_with_substring.append(key)
-    if return_first:
+    if substring in keys_with_substring:
+        return substring
+    elif return_first:
         return keys_with_substring[0]
     else:
         return keys_with_substring
@@ -102,9 +104,11 @@ def update_trodes_file_to_data(file_path, file_to_data=None):
     absolute_file_path = os.path.abspath(file_path)
     try:
         # Reading in the Trodes recording file with the function 
-        trodes_recording = parse_exported_file(absolute_file_path)      
-        file_to_data[file_name] = trodes_recording
-        file_to_data[file_name]["absolute_file_path"] = absolute_file_path
+        trodes_recording = parse_exported_file(absolute_file_path)
+
+        file_prefix = ".".join(pathlib.Path(file_name).suffixes) 
+        file_to_data[file_prefix] = trodes_recording
+        file_to_data[file_prefix]["absolute_file_path"] = absolute_file_path
         return file_to_data
     except:
         # TODO: Fix format so that file path is included in warning
@@ -134,6 +138,8 @@ def get_all_trodes_data_from_directory(parent_directory_path="."):
         # If the item is a file instead of a directory
         else:
             current_directory_name = "."
+        directory_prefix = ".".join(pathlib.Path(current_directory_name).suffixes) 
+
         current_directory_path = os.path.join(parent_directory_path, current_directory_name)
         # Going through each file in the directory
         for file_name in os.listdir(current_directory_path):
@@ -143,5 +149,5 @@ def get_all_trodes_data_from_directory(parent_directory_path="."):
                 current_directory_to_file_to_data = update_trodes_file_to_data(file_path=file_path, file_to_data=directory_to_file_to_data[current_directory_name])
                 # None will be returned if the file can not be processed
                 if current_directory_to_file_to_data is not None:
-                    directory_to_file_to_data[current_directory_name] = current_directory_to_file_to_data
+                    directory_to_file_to_data[directory_prefix] = current_directory_to_file_to_data
     return directory_to_file_to_data
