@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+"""
+"""
+
 import numpy as np
 import re
 
-# Main function
-def read_trodes_extracted_data_file(file_path):
+def parse_exported_file(file_path):
     """
     """
     with open(file_path, 'rb') as f:
@@ -14,7 +16,7 @@ def read_trodes_extracted_data_file(file_path):
         fields_text = {}
         for line in f:
             # Read through block of settings
-            if(fields):
+            if fields:
                 line = line.decode('ascii').strip()
                 # filling in fields dict
                 if line != '<End settings>':
