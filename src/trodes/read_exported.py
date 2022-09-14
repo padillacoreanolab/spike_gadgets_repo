@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
 """
-
-import numpy as np
+import os
+import warnings
 import re
+from collections import defaultdict
+import numpy as np
 
 def parse_exported_file(file_path):
     """
@@ -78,3 +80,33 @@ def get_key_with_substring(input_dict, substring="", return_first=True):
         return keys_with_substring[0]
     else:
         return keys_with_substring
+
+def update_trodes_file_to_metadata(file_path, file_to_metadata=None):
+    """
+    Get the data/metadata froma a Trodes recording file. Save it to a dictionary with the file name as the key. 
+    And the name of the data/metadata(sub-key) and the data/metadata point(sub-value) as a subdictionary for the value. 
+
+    Args:
+        file_path(str): Path of the Trodes recording file. Can be relative or absolute path.
+        file_to_metadata(dict): Dictionary that had the trodes file name as the key and the 
+
+    Returns:
+        Dictionary that has file name keys with a subdictionary of all the different data/metadata from the Trodes recording file.
+    """
+    
+    # Creating a new dictionary is none is inputted
+    if file_to_metadata is None: 
+        file_to_metadata = defaultdict(dict)
+    # Getting just the file name to use as the key
+    file_name = os.path.basename(file_path)
+    # Getting the absolute file path as metadata
+    absolute_file_path = os.path.abspath(file_path)
+    try:
+        # Reading in the Trodes recording file with the function 
+        trodes_recording = parse_exported_file(absolute_file_path)      
+        file_to_metadata[file_name] = trodes_recording
+        file_to_metadata[file_name]["absolute_file_path"] = absolute_file_path
+        return file_to_metadata
+    except:
+        warnings.warn("Can not process {}".format(absolute_file_path))
+        return None
