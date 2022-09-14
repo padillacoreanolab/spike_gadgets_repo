@@ -2,6 +2,7 @@
 data/
 proc/
 conda_environment/
+old/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
