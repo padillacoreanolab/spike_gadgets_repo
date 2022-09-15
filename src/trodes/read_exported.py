@@ -83,6 +83,28 @@ def get_key_with_substring(input_dict, substring="", return_first=True):
     else:
         return keys_with_substring
 
+def get_all_file_suffixes(file_name):
+    """
+    Creates a string of the suffixes of a file name that's joined together by "."
+    Suffixes will be all the parts of the file name that follows the first "."
+    Example: "file.txt.zip.asc" >> "txt.zip.asc"
+    
+    Args:
+        file_name(str): Name of the file
+
+    Returns:
+        String of all the suffixes joined by "."
+    """
+    # Getting all the suffixes in the file name
+    # And removing any periods before and after
+    stripped_suffixes = [suffix.strip(".") for suffix in pathlib.Path(file_name).suffixes]
+    
+    if stripped_suffixes:
+        return ".".join(stripped_suffixes) 
+    # When the file name is just a ".", the stripped suffix is blank
+    else:
+        return "."
+
 def update_trodes_file_to_data(file_path, file_to_data=None):
     """
     Get the data/metadata froma a Trodes recording file. Save it to a dictionary with the file name as the key. 
@@ -106,7 +128,8 @@ def update_trodes_file_to_data(file_path, file_to_data=None):
         # Reading in the Trodes recording file with the function 
         trodes_recording = parse_exported_file(absolute_file_path)
 
-        file_prefix = ".".join(pathlib.Path(file_name).suffixes) 
+        file_prefix = get_all_file_suffixes(file_name) 
+        print("file prefix: {}".format(file_prefix))
         file_to_data[file_prefix] = trodes_recording
         file_to_data[file_prefix]["absolute_file_path"] = absolute_file_path
         return file_to_data
@@ -138,7 +161,7 @@ def get_all_trodes_data_from_directory(parent_directory_path="."):
         # If the item is a file instead of a directory
         else:
             current_directory_name = "."
-        directory_prefix = ".".join(pathlib.Path(current_directory_name).suffixes) 
+        directory_prefix = get_all_file_suffixes(current_directory_name) 
 
         current_directory_path = os.path.join(parent_directory_path, current_directory_name)
         # Going through each file in the directory
@@ -149,5 +172,7 @@ def get_all_trodes_data_from_directory(parent_directory_path="."):
                 current_directory_to_file_to_data = update_trodes_file_to_data(file_path=file_path, file_to_data=directory_to_file_to_data[current_directory_name])
                 # None will be returned if the file can not be processed
                 if current_directory_to_file_to_data is not None:
+                    print("directory prefix: {}".format(directory_prefix))
                     directory_to_file_to_data[directory_prefix] = current_directory_to_file_to_data
     return directory_to_file_to_data
+
